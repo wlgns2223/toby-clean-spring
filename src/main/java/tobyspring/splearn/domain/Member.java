@@ -3,7 +3,7 @@ package tobyspring.splearn.domain;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.Objects;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.*;
 import static org.springframework.util.Assert.state;
@@ -11,7 +11,7 @@ import static org.springframework.util.Assert.state;
 @Getter
 @ToString
 public class Member {
-    private String email;
+    private Email email;
 
     private String nickname;
 
@@ -24,7 +24,9 @@ public class Member {
     public static Member create(MemberCreateRequest createRequest, PasswordEncoder passwordEncoder){
         Member member = new Member();
 
-        member.email = requireNonNull(createRequest.email());
+        String email = createRequest.email();
+
+        member.email = new Email(requireNonNull(email));
         member.nickname = requireNonNull(createRequest.nickname());
         member.passwordHash = passwordEncoder.encode(requireNonNull(createRequest.password()));
         member.status = MemberStatus.PENDING;

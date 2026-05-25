@@ -114,4 +114,13 @@ class MemberTest {
         assertThat(member.isActive()).isTrue();
     }
 
+    @Test
+    void invalidEmail() {
+        assertThatThrownBy(() -> {
+            Member.create(new MemberCreateRequest("invalid email", "Toby", "Secret"), passwordEncoder);
+        }).isInstanceOf(IllegalArgumentException.class);
+
+
+    }
+
 }
