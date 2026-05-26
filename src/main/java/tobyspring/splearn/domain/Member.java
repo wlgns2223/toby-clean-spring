@@ -1,27 +1,39 @@
 package tobyspring.splearn.domain;
 
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.util.regex.Pattern;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 
 import static java.util.Objects.*;
 import static org.springframework.util.Assert.state;
 
+@Entity
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NaturalIdCache // 같은 트랜잭션안에서 같은 아이디로 읽을때 영속 컨텍스트안에서 읽어옴. 이메일로 읽어올때도.
 public class Member {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Embedded
+    @NaturalId // hibernate 지원, unique 조건 걸어줌
     private Email email;
 
     private String nickname;
 
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
-    private Member() {}
-
-    public static Member create(MemberCreateRequest createRequest, PasswordEncoder passwordEncoder){
+    public static Member register(MemberRegisterRequest createRequest, PasswordEncoder passwordEncoder){
         Member member = new Member();
 
         String email = createRequest.email();
