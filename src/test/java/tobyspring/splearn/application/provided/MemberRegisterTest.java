@@ -1,108 +1,76 @@
 package tobyspring.splearn.application.provided;
 
-import lombok.Getter;
+import jakarta.persistence.EntityManager;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.test.util.ReflectionTestUtils;
-import tobyspring.splearn.application.MemberService;
-import tobyspring.splearn.application.required.EmailSender;
-import tobyspring.splearn.application.required.MemberRepository;
-import tobyspring.splearn.domain.Email;
-import tobyspring.splearn.domain.Member;
-import tobyspring.splearn.domain.MemberFixture;
-import tobyspring.splearn.domain.MemberStatus;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestConstructor;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import tobyspring.splearn.SplearnTestConfiguration;
+import tobyspring.splearn.domain.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 
-class MemberRegisterTest {
+/**
+ *
+ * Transactional을 붙이면 테스트를 수행하는 동안에
+ * 데이터베이스에 했던 모든 작업을 테스트가 끝날때 성공이든 실패든 상관없이 롤백을 시켜줌
+ *
+ * Classes annotated with '@Transactional' could be implicitly subclassed and must not be final
+ * 위 에러는 무시. 버그임
+ */
+
+@SpringBootTest
+@Transactional
+@Import(SplearnTestConfiguration.class)
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+public record MemberRegisterTest(MemberRegister memberRegister, EntityManager entityManager) {
+    /**
+     * Test작성시 class에 autowired가 너무 많으면 보기 힘드니,
+     * JUnit에 따르면 간결하게 record로 작성해도 되지만, Bean 주입 방법을 명시해줘야함
+     * @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+     */
 
     @Test
-    void registerTestStub() {
-        MemberRegister register = new MemberService(
-                new MemberRepositoryStub(),
-                new EmailSenderStub(),
-                MemberFixture.createPasswordEncoder()
-        );
-
-        Member member = register.register(MemberFixture.createMemberRegisterRequest());
-
-        assertThat(member.getId()).isNotNull();
-        assertThat(member.getStatus()).isEqualTo(MemberStatus.PENDING);
-    }
-
-    @Test
-    void registerTestMock() {
-
-        EmailSenderMock emailSenderMock = new EmailSenderMock();
-
-        MemberRegister register = new MemberService(
-                new MemberRepositoryStub(),
-                emailSenderMock,
-                MemberFixture.createPasswordEncoder()
-        );
-
-        Member member = register.register(MemberFixture.createMemberRegisterRequest());
+    void register() {
+        Member member = memberRegister.register(MemberFixture.createMemberRegisterRequest());
 
         assertThat(member.getId()).isNotNull();
         assertThat(member.getStatus()).isEqualTo(MemberStatus.PENDING);
 
-        assertThat(emailSenderMock.getTos()).hasSize(1);
-        assertThat(emailSenderMock.getTos().getFirst()).isEqualTo(member.getEmail());
     }
 
     @Test
-    void registerTestMockito() {
-
-        EmailSender emailSenderMock = Mockito.mock(EmailSender.class);
-
-        MemberRegister register = new MemberService(
-                new MemberRepositoryStub(),
-                emailSenderMock,
-                MemberFixture.createPasswordEncoder()
-        );
-
-        Member member = register.register(MemberFixture.createMemberRegisterRequest());
-
-        assertThat(member.getId()).isNotNull();
-        assertThat(member.getStatus()).isEqualTo(MemberStatus.PENDING);
-
-        Mockito.verify(emailSenderMock).send(eq(member.getEmail()),any(),any());
+    void duplicateEmailFail() {
+        Member member = memberRegister.register(MemberFixture.createMemberRegisterRequest());
+        assertThatThrownBy(() -> memberRegister.register(MemberFixture.createMemberRegisterRequest()))
+                .isInstanceOf(DuplicateEmailException.class);
     }
 
-    static class MemberRepositoryStub implements MemberRepository {
-        @Override
-        public Member save(Member member) {
-            ReflectionTestUtils.setField(member,"id",1L);
-            return member;
-        }
-    }
-
-    static class EmailSenderStub implements EmailSender {
-        @Override
-        public void send(Email email, String subject, String body) {
-
-        }
-    }
-
-    // mock interaction 검증도
-    @Getter
-    static class EmailSenderMock implements EmailSender {
-
-        List<Email> tos = new ArrayList<>();
-
-        @Override
-        public void send(Email email, String subject, String body) {
-            tos.add(email);
-
-        }
+    @Test
+    void memberRegisterRequestFail() {
+        MemberRegisterRequest invalid = new MemberRegisterRequest("toby@splearn.app", "Toby", "verysecret");
+        assertThatThrownBy(() -> memberRegister.register(invalid)).isInstanceOf(ConstraintViolationException.class);
 
     }
 
+    @Test
+    void activate() {
+        Member member = memberRegister.register(MemberFixture.createMemberRegisterRequest());
+
+        /**
+         * 영속성 컨텍스트를 비워줘야 실제 쿼리가 디비까지 이어지는지 확인할 수 있다.
+         * flush가 없으면 insert 문만 로그에 남음
+         */
+        entityManager.flush();
+        entityManager.clear();
+
+        member = memberRegister.activate(member.getId());
+
+        entityManager.flush();
+
+        assertThat(member.getStatus()).isEqualTo(MemberStatus.ACTIVE);
+    }
 }
