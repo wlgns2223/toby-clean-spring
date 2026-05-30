@@ -1,11 +1,12 @@
-package tobyspring.splearn.domain;
+package tobyspring.splearn.domain.shared;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 import java.util.regex.Pattern;
 
 @Embeddable
-public record Email(String address) {
+public record Email(@Column(length = 100,nullable = false,name = "email") String address) {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$");
 
     public Email {

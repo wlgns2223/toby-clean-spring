@@ -1,14 +1,17 @@
-package tobyspring.splearn.application;
+package tobyspring.splearn.application.member;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import tobyspring.splearn.application.provided.MemberFinder;
-import tobyspring.splearn.application.provided.MemberRegister;
-import tobyspring.splearn.application.required.EmailSender;
-import tobyspring.splearn.application.required.MemberRepository;
-import tobyspring.splearn.domain.*;
+import tobyspring.splearn.application.member.provided.MemberFinder;
+import tobyspring.splearn.application.member.provided.MemberRegister;
+import tobyspring.splearn.application.member.required.EmailSender;
+import tobyspring.splearn.application.member.required.MemberRepository;
+import tobyspring.splearn.domain.member.*;
+import tobyspring.splearn.domain.shared.Email;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +73,37 @@ public class MemberModifyService implements MemberRegister {
     private void checkDuplicateEmail(MemberRegisterRequest registerRequest) {
         if(memberRepository.findByEmail(new Email(registerRequest.email())).isPresent()){
             throw new DuplicateEmailException("이미 사용중인 이메일 입니다.");
+        }
+    }
+
+    @Override
+    public Member deactivate(Long memberId) {
+        Member member = memberFinder.find(memberId);
+
+        member.deactivate();
+
+        return memberRepository.save(member);
+    }
+
+    @Override
+    public Member updateInfo(Long memberId,MemberInfoUpdateRequest request) {
+        Member member = memberFinder.find(memberId);
+
+        checkDuplicateProfile(member, request.profileAddress());
+
+
+        member.updateInfo(request);
+
+        return memberRepository.save(member);
+    }
+
+    private void checkDuplicateProfile(Member member,  String profile) {
+        if(profile.isEmpty()) return;
+        Profile currentProfile = member.getDetail().getProfile();
+        if(currentProfile != null && currentProfile.value().equals(profile)) return;
+
+        if(memberRepository.findByProfile((new Profile(profile))).isPresent()){
+            throw new IllegalArgumentException("이미 존재하는 프로필 주소입니다.");
         }
     }
 }

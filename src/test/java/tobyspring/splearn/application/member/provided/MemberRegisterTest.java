@@ -1,4 +1,4 @@
-package tobyspring.splearn.application.provided;
+package tobyspring.splearn.application.member.provided;
 
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolationException;
@@ -7,9 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import tobyspring.splearn.SplearnTestConfiguration;
 import tobyspring.splearn.domain.*;
+import tobyspring.splearn.domain.member.*;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -58,19 +58,76 @@ public record MemberRegisterTest(MemberRegister memberRegister, EntityManager en
 
     @Test
     void activate() {
-        Member member = memberRegister.register(MemberFixture.createMemberRegisterRequest());
-
-        /**
-         * 영속성 컨텍스트를 비워줘야 실제 쿼리가 디비까지 이어지는지 확인할 수 있다.
-         * flush가 없으면 insert 문만 로그에 남음
-         */
-        entityManager.flush();
-        entityManager.clear();
+        Member member = getMember();
 
         member = memberRegister.activate(member.getId());
 
         entityManager.flush();
 
         assertThat(member.getStatus()).isEqualTo(MemberStatus.ACTIVE);
+    }
+
+    @Test
+    void deactivate() {
+        Member member = getMember();
+
+        memberRegister.activate(member.getId());
+        entityManager.flush();
+        entityManager.clear();
+
+        member = memberRegister.deactivate(member.getId());
+
+        assertThat(member.getStatus()).isEqualTo(MemberStatus.DEACTIVATED);
+        assertThat(member.getDetail().getDeactivatedAt()).isNotNull();
+
+    }
+
+    private Member getMember() {
+        Member member = memberRegister.register(MemberFixture.createMemberRegisterRequest());
+        entityManager.flush();
+        entityManager.clear();
+        return member;
+    }
+
+    private Member getMember(String email) {
+        Member member = memberRegister.register(MemberFixture.createMemberRegisterRequest(email));
+        entityManager.flush();
+        entityManager.clear();
+        return member;
+    }
+
+    @Test
+    void updateInfo() {
+        Member member = getMember();
+        memberRegister.activate(member.getId());
+        entityManager.flush();
+        entityManager.clear();
+
+        member = memberRegister.updateInfo(member.getId(), new MemberInfoUpdateRequest("leo1234", "toby", "introduction"));
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(member.getDetail().getProfile().value()).isEqualTo("toby");
+    }
+
+    @Test
+    void updateInfoFail() {
+        Member member = getMember();
+        memberRegister.activate(member.getId());
+        memberRegister.updateInfo(member.getId(), new MemberInfoUpdateRequest("peter", "toby100", "introduction"));
+
+        Member member2 = getMember("anEmail@gmail.com");
+        memberRegister.activate(member2.getId());
+
+        entityManager.flush();
+        entityManager.clear();
+
+
+        assertThatThrownBy(() -> {
+            memberRegister.updateInfo(
+                    member2.getId(), new MemberInfoUpdateRequest("newNickname", "toby100", "introduction")
+            );
+        }).isInstanceOf(IllegalArgumentException.class);
+
     }
 }

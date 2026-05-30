@@ -20,11 +20,8 @@ repositories {
 
 val mockitoAgent = configurations.create("mockitoAgent")
 
-tasks.test {
-	jvmArgs("-javaagent:${mockitoAgent.asPath}")
-}
-
 dependencies {
+	implementation("org.springframework.security:spring-security-core")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -38,9 +35,12 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testAnnotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.mockito:mockito-core")
+	testImplementation("org.junit-pioneer:junit-pioneer:2.3.0")
+
 	mockitoAgent("org.mockito:mockito-core") { isTransitive = false }
 }
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	jvmArgs("-javaagent:${mockitoAgent.asPath}")
 }
