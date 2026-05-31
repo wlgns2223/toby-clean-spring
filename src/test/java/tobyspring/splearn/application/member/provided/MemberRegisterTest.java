@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import tobyspring.splearn.SplearnTestConfiguration;
+import tobyspring.splearn.domain.MemberRegisterRequest;
 import tobyspring.splearn.domain.*;
 import tobyspring.splearn.domain.member.*;
 

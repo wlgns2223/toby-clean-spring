@@ -1,0 +1,25 @@
+package tobyspring.splearn.adapter.webapi;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import tobyspring.splearn.adapter.webapi.dto.MemberRegisterResponse;
+import tobyspring.splearn.application.member.provided.MemberRegister;
+import tobyspring.splearn.domain.member.Member;
+import tobyspring.splearn.domain.MemberRegisterRequest;
+
+@RestController
+@RequiredArgsConstructor
+public class MemberApi {
+
+    private final MemberRegister memberRegister;
+
+    @PostMapping("/api/members")
+    public MemberRegisterResponse register(@RequestBody @Valid MemberRegisterRequest request){
+        // 여기가 뷰가 됌
+        Member member = memberRegister.register(request);
+        return MemberRegisterResponse.of(member);
+    }
+}

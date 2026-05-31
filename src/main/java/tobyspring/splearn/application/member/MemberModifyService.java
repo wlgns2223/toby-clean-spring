@@ -1,7 +1,5 @@
 package tobyspring.splearn.application.member;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +8,7 @@ import tobyspring.splearn.application.member.provided.MemberFinder;
 import tobyspring.splearn.application.member.provided.MemberRegister;
 import tobyspring.splearn.application.member.required.EmailSender;
 import tobyspring.splearn.application.member.required.MemberRepository;
+import tobyspring.splearn.domain.MemberRegisterRequest;
 import tobyspring.splearn.domain.member.*;
 import tobyspring.splearn.domain.shared.Email;
 

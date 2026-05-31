@@ -8,6 +8,7 @@ import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.util.Assert;
+import tobyspring.splearn.domain.MemberRegisterRequest;
 import tobyspring.splearn.domain.AbstractEntity;
 import tobyspring.splearn.domain.shared.Email;
 

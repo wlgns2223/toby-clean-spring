@@ -1,7 +1,8 @@
 package tobyspring.splearn.domain;
 
 import org.springframework.lang.NonNull;
-import tobyspring.splearn.domain.member.MemberRegisterRequest;
+import org.springframework.test.util.ReflectionTestUtils;
+import tobyspring.splearn.domain.member.Member;
 import tobyspring.splearn.domain.member.PasswordEncoder;
 
 public class MemberFixture {
@@ -15,6 +16,17 @@ public class MemberFixture {
     public static MemberRegisterRequest createMemberRegisterRequest() {
         return createMemberRegisterRequest("toby@splearn.app");
     }
+
+    public static Member createMember(){
+        return Member.register(createMemberRegisterRequest(),createPasswordEncoder());
+    }
+
+    public static Member createMember(Long memberId){
+        Member member = Member.register(createMemberRegisterRequest(),createPasswordEncoder());
+        ReflectionTestUtils.setField(member,"id",memberId);
+        return member;
+    }
+
 
     @NonNull
     public static PasswordEncoder createPasswordEncoder() {
