@@ -2,6 +2,7 @@ package tobyspring.splearn.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tobyspring.splearn.application.member.provided.MemberRegisterRequest;
 import tobyspring.splearn.domain.member.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -17,7 +18,7 @@ class MemberTest {
     void setUp(){
         passwordEncoder = createPasswordEncoder();
 
-        member = Member.register(createMemberRegisterRequest(), passwordEncoder);
+        member = Member.register(createMemberRegisterRequest().toInfo(), passwordEncoder);
     }
 
 
@@ -30,7 +31,7 @@ class MemberTest {
 
     @Test
     void constructorNullCheck() {
-        assertThatThrownBy(() -> Member.register(new MemberRegisterRequest(null, "Toby", "secret"),passwordEncoder))
+        assertThatThrownBy(() -> Member.register(new MemberRegisterRequest(null, "Toby", "secret").toInfo(),passwordEncoder))
                 .isInstanceOf(NullPointerException.class);
     }
 
@@ -111,7 +112,7 @@ class MemberTest {
     @Test
     void invalidEmail() {
         assertThatThrownBy(() -> {
-            Member.register(createMemberRegisterRequest("invalid email"), passwordEncoder);
+            Member.register(createMemberRegisterRequest("invalid email").toInfo(), passwordEncoder);
         }).isInstanceOf(IllegalArgumentException.class);
         
     }

@@ -8,7 +8,7 @@ import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.util.Assert;
-import tobyspring.splearn.domain.MemberRegisterRequest;
+import tobyspring.splearn.application.member.provided.MemberRegisterRequest;
 import tobyspring.splearn.domain.AbstractEntity;
 import tobyspring.splearn.domain.shared.Email;
 
@@ -40,7 +40,13 @@ public class Member extends AbstractEntity {
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private MemberDetail detail;
 
-    public static Member register(MemberRegisterRequest createRequest, PasswordEncoder passwordEncoder){
+    /*
+    리팩토링 기법으로 기존의 테스트가 깨지지 않는 것을 유지하면서 리팩토링 해 내가는 방법
+    레거시를 쓰는 코드를 새로운 코드로 바꿔나가면서
+    내부에서는 새로운 코드를 사용하도록 변경
+     */
+
+    public static Member register(MemberRegisterInfo createRequest, PasswordEncoder passwordEncoder){
         Member member = new Member();
 
         String email = createRequest.email();

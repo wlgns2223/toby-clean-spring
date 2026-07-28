@@ -8,7 +8,7 @@ import tobyspring.splearn.application.member.provided.MemberFinder;
 import tobyspring.splearn.application.member.provided.MemberRegister;
 import tobyspring.splearn.application.member.required.EmailSender;
 import tobyspring.splearn.application.member.required.MemberRepository;
-import tobyspring.splearn.domain.MemberRegisterRequest;
+import tobyspring.splearn.application.member.provided.MemberRegisterRequest;
 import tobyspring.splearn.domain.member.*;
 import tobyspring.splearn.domain.shared.Email;
 
@@ -38,7 +38,7 @@ public class MemberModifyService implements MemberRegister {
         checkDuplicateEmail(registerRequest);
 
         // domain model
-        Member member = Member.register(registerRequest, passwordEncoder);
+        Member member = Member.register(registerRequest.toInfo(), passwordEncoder);
         // repository 저장
         memberRepository.save(member);
         // 후처리 작업

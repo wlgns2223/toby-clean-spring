@@ -17,7 +17,7 @@ import tobyspring.splearn.application.member.provided.MemberRegister;
 import tobyspring.splearn.application.member.required.MemberRepository;
 import tobyspring.splearn.domain.MemberFixture;
 import tobyspring.splearn.domain.member.Member;
-import tobyspring.splearn.domain.MemberRegisterRequest;
+import tobyspring.splearn.application.member.provided.MemberRegisterRequest;
 
 import java.io.UnsupportedEncodingException;
 
@@ -45,7 +45,6 @@ public class MemberApiTest {
     MemberRegister memberRegister;
 
 
-
     @Test
     void register() throws JsonProcessingException, UnsupportedEncodingException {
         MemberRegisterRequest request = MemberFixture.createMemberRegisterRequest();
@@ -71,7 +70,6 @@ public class MemberApiTest {
 
     @Test
     void registerFail() throws JsonProcessingException {
-        ;
         memberRegister.register(MemberFixture.createMemberRegisterRequest());
 
         MemberRegisterRequest request = MemberFixture.createMemberRegisterRequest();

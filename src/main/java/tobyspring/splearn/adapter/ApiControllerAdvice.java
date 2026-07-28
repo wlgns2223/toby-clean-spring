@@ -19,7 +19,7 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(DuplicateEmailException.class)
-    public ProblemDetail emailExceptionHandler(DuplicateEmailException e){
+    public ProblemDetail emailExceptionHandler(RuntimeException e){
         // RFC 9457에 정의된 예외를 다루는 방식
 
         // 버그인 경우에는 그냥 예외를 던지면 되는데
