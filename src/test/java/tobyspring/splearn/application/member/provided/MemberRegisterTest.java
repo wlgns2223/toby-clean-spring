@@ -2,6 +2,7 @@ package tobyspring.splearn.application.member.provided;
 
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolationException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -35,6 +36,7 @@ public record MemberRegisterTest(MemberRegister memberRegister, EntityManager en
 
     @Test
     void register() {
+        MemberFixture.createMemberRegisterRequest();
         Member member = memberRegister.register(MemberFixture.createMemberRegisterRequest());
 
         assertThat(member.getId()).isNotNull();
@@ -44,8 +46,9 @@ public record MemberRegisterTest(MemberRegister memberRegister, EntityManager en
 
     @Test
     void duplicateEmailFail() {
-        Member member = memberRegister.register(MemberFixture.createMemberRegisterRequest());
-        assertThatThrownBy(() -> memberRegister.register(MemberFixture.createMemberRegisterRequest()))
+        MemberRegisterRequest registerRequest =  MemberFixture.createMemberRegisterRequest();
+        memberRegister.register(registerRequest);
+        assertThatThrownBy(() -> memberRegister.register(registerRequest))
                 .isInstanceOf(DuplicateEmailException.class);
     }
 

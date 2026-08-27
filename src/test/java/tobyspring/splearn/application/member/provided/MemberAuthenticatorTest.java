@@ -11,6 +11,7 @@ import tobyspring.splearn.SplearnTestConfiguration;
 import tobyspring.splearn.domain.MemberFixture;
 import tobyspring.splearn.domain.member.Member;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,10 +31,13 @@ class MemberAuthenticatorTest {
     void login() {
         // given
         MemberRegisterRequest registrationRequest = MemberFixture.createMemberRegisterRequest();
-        memberRegister.register(registrationRequest).activate();
+        Member member = memberRegister.register(registrationRequest);
+        member.activate();
 
         // when
-        memberAuthenticator.login(new MemberLoginRequest(registrationRequest.email(),registrationRequest.password()));
+        Member loggedInmember = memberAuthenticator.login(new MemberLoginRequest(registrationRequest.email(), registrationRequest.password()));
+
+        assertThat(loggedInmember).isEqualTo(member);
 
     }
 

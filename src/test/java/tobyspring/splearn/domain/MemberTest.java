@@ -13,12 +13,13 @@ import static tobyspring.splearn.domain.MemberFixture.createPasswordEncoder;
 class MemberTest {
     Member member;
     PasswordEncoder passwordEncoder;
+    private MemberRegisterRequest registerRequest;
 
     @BeforeEach
     void setUp(){
         passwordEncoder = createPasswordEncoder();
-
-        member = Member.register(createMemberRegisterRequest().toInfo(), passwordEncoder);
+        registerRequest = createMemberRegisterRequest();
+        member = Member.register(registerRequest.toInfo(), passwordEncoder);
     }
 
 
@@ -80,13 +81,13 @@ class MemberTest {
 
     @Test
     void verifyPassword() {
-        assertThat(member.verifyPassword("verysecret",passwordEncoder)).isTrue();
+        assertThat(member.verifyPassword(registerRequest.password(), passwordEncoder)).isTrue();
         assertThat(member.verifyPassword("hello", passwordEncoder)).isFalse();
     }
 
     @Test
     void changeNickname() {
-        assertThat(member.getNickname()).isEqualTo("Charlie");
+        assertThat(member.getNickname()).isEqualTo(registerRequest.nickname());
 
         member.changeNickname("Charlie2");
 
