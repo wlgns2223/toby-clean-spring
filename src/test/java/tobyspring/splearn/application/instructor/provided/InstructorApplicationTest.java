@@ -14,6 +14,7 @@ import tobyspring.splearn.domain.instructor.Instructor;
 import tobyspring.splearn.domain.instructor.InstructorFixture;
 import tobyspring.splearn.domain.instructor.InstructorStatus;
 import tobyspring.splearn.domain.member.Member;
+import tobyspring.splearn.support.test.BaseApplicationService;
 
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class InstructorApplicationTest {
+class InstructorApplicationTest extends BaseApplicationService {
 
     @Autowired
     InstructorApplication instructorApplication;
@@ -31,7 +32,6 @@ class InstructorApplicationTest {
     @Autowired
     InstructorRepository instructorRepository;
 
-    
     @Autowired
     MemberRepository memberRepository;
     
@@ -39,7 +39,8 @@ class InstructorApplicationTest {
     @DisplayName("apply")
     void appy() {
         // given
-        Instructor instructor = preparePendingInstructor();
+        prepareMember();
+        Instructor instructor = instructorApplication.apply(InstructorFixture.createApplyRequest(member));
 
         // then
         assertThat(instructor.getId()).isNotNull();

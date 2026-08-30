@@ -12,11 +12,17 @@ public class InstructorFixture {
     }
 
     public static Instructor createInstructor(){
-        return createInstructor(MemberFixture.createMember());
+        return createInstructor(MemberFixture.createActiveMember());
     }
 
     public static Instructor createActiveInstructor(){
         Instructor instructor = createInstructor();
+        instructor.approve();
+        return instructor;
+    }
+
+    public static Instructor createActiveInstructor(Member member) {
+        Instructor instructor = createInstructor(member);
         instructor.approve();
         return instructor;
     }
