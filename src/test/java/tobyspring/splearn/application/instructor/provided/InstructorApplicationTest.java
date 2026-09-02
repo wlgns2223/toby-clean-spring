@@ -1,11 +1,9 @@
 package tobyspring.splearn.application.instructor.provided;
 
-import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import tobyspring.splearn.application.instructor.required.InstructorRepository;
 import tobyspring.splearn.application.member.required.MemberRepository;
@@ -16,11 +14,8 @@ import tobyspring.splearn.domain.instructor.InstructorStatus;
 import tobyspring.splearn.domain.member.Member;
 import tobyspring.splearn.support.test.BaseApplicationService;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -39,7 +34,7 @@ class InstructorApplicationTest extends BaseApplicationService {
     @DisplayName("apply")
     void appy() {
         // given
-        prepareMember();
+        prepareActiveMember();
         Instructor instructor = instructorApplication.apply(InstructorFixture.createApplyRequest(member));
 
         // then

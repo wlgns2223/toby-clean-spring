@@ -67,4 +67,18 @@ public class CourseValidationService implements CourseValidator {
         });
     }
 
+    @Override
+    public void validateForReview(Course course) {
+        //TODO
+    }
+
+    @Override
+    public void validateForPublish(Course course) {
+        //TODO
+    }
+
+    @Override
+    public void validateForArchive(Course course) {
+        //TODO
+    }
 }

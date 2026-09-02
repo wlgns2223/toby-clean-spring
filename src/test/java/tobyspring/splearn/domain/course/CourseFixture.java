@@ -62,4 +62,12 @@ public class CourseFixture {
                 .create();
 
     }
+
+    public static Course createPublishedCourse() {
+        Course course = createCourse();
+        course.updateInfo(createCourseInfoUpdateRequest(course.getTitle()).toInfo());
+        course.submitForReview();
+        course.publish();
+        return course;
+    }
 }
