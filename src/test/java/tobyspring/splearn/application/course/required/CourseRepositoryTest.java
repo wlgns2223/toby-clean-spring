@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-class CourseRepositoryTest {
+class CourseRepositoryTest  {
 
     @Autowired
     CourseRepository courseRepository;

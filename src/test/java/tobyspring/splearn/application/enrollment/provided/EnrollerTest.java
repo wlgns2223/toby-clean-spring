@@ -48,8 +48,8 @@ class EnrollerTest extends BaseApplicationService {
     void complete() {
         prepareEnrollment();
 
-        Enrollment enrollmentStudying = enroller.complete(enrollment.getId());
+        Enrollment enrollerComplete = enroller.complete(enrollment.getId());
 
-        assertThat(enrollmentStudying.getStatus()).isEqualTo(EnrollmentStatus.COMPLETED);
+        assertThat(enrollerComplete.getStatus()).isEqualTo(EnrollmentStatus.COMPLETED);
     }
 }

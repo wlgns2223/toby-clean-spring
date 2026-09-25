@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import tobyspring.splearn.application.course.provided.*;
 import tobyspring.splearn.application.course.required.CourseRepository;
+import tobyspring.splearn.application.course.required.CurriculumCreator;
 import tobyspring.splearn.application.instructor.provided.InstructorFinder;
 import tobyspring.splearn.domain.course.Course;
 import tobyspring.splearn.domain.instructor.Instructor;
@@ -20,12 +21,14 @@ public class CourseModifyService implements CourseCreator,CoursePublisher {
     private final CourseFinder courseFinder;
     private final InstructorFinder instructorFinder;
     private final CourseValidator courseValidator;
+    private final CurriculumCreator curriculumCreator;
 
     @Override
     public Course create(CourseCreateRequest createRequest) {
         Instructor instructor = instructorFinder.find(createRequest.instructorId());
         courseValidator.validateForCreate(instructor,createRequest);
         Course course = new Course(instructor, createRequest.title(), createRequest.description());
+        curriculumCreator.createCurriculum(course); // DIP가 적용된 라인. 인터페이스뿐만 아니라 소유권까지 역전해야함
         return courseRepository.save(course);
     }
 
